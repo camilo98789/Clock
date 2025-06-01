@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Reloj con Letras Cayendo</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: white;
+      font-family: 'Courier New', monospace;
+      height: 100vh;
+      width: 100vw;
+      position: relative;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    .clock-container {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      top: 40%;
+      transform: translateY(-50%);
+      color: white;
+      text-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px white;
+    }
+
+    #date {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+    }
+
+    #clock {
+      font-size: 2.5em;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrixCanvas"></canvas>
+  <div class="clock-container">
+    <div id="date"></div>
+    <div id="clock"></div>
+  </div>
+
+  <script>
+    // Reloj
+    function updateClock() {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('date').innerText = now.toLocaleDateString('es-ES', options);
+      document.getElementById('clock').innerText = now.toLocaleTimeString('es-ES');
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Letras cayendo tipo Matrix pero en gris claro
+    const canvas = document.getElementById('matrixCanvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    const drops = [];
+
+    for (let x = 0; x < columns; x++) {
+      drops[x] = 1;
+    }
+
+    function draw() {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#aaa'; // gris claro
+      ctx.font = fontSize + "px monospace";
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+
+        drops[i]++;
+      }
+    }
+
+    setInterval(draw, 33);
+    window.addEventListener('resize', () => location.reload());
+  </script>
+</body>
+</html>
